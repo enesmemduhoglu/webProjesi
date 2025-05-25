@@ -7,7 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import Map from '@/components/ui/map';
 import { useState } from "react";
 import { Input } from '@/components/ui/input';
-import { MapPin, Clock, DollarSign, Info, Calendar, Star } from 'lucide-react';
+import { MapPin, Clock, DollarSign, Info, Calendar, Star, LogIn, UserPlus, History } from 'lucide-react';
+import { useSession, signIn, signOut } from "next-auth/react";
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface Location {
   name: string;
@@ -16,6 +19,8 @@ interface Location {
 }
 
 export default function Home() {
+  const { data: session } = useSession();
+  const router = useRouter();
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -116,6 +121,24 @@ export default function Home() {
       const data = await response.json();
       setResult(data.result);
       
+      // Save chat history if user is logged in
+      if (session?.user) {
+        try {
+          await fetch('/api/chats', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              prompt,
+              response: data.result,
+            }),
+          });
+        } catch (error) {
+          console.error('Error saving chat history:', error);
+        }
+      }
+      
       const foundLocations = await extractLocations(data.result);
       setLocations(foundLocations);
     } catch (error) {
@@ -215,6 +238,46 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 relative overflow-hidden">
+      {/* Auth Buttons */}
+      <div className="absolute top-4 right-4 z-50 flex gap-4">
+        {session ? (
+          <>
+            <Link href="/history">
+              <Button
+                className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-300 transform hover:scale-105"
+              >
+                <History className="w-5 h-5 mr-2" />
+                Geçmiş
+              </Button>
+            </Link>
+            <Button
+              onClick={() => signOut()}
+              className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-300 transform hover:scale-105"
+            >
+              <LogIn className="w-5 h-5 mr-2" />
+              Çıkış Yap
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              onClick={() => router.push('/login')}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-300 transform hover:scale-105"
+            >
+              <LogIn className="w-5 h-5 mr-2" />
+              Giriş Yap
+            </Button>
+            <Button
+              onClick={() => router.push('/register')}
+              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-300 transform hover:scale-105"
+            >
+              <UserPlus className="w-5 h-5 mr-2" />
+              Kayıt Ol
+            </Button>
+          </>
+        )}
+      </div>
+
       {/* Arka plan dekoratif elementler */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
         <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full blur-3xl animate-pulse"></div>
