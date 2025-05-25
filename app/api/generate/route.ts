@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4-turbo",
       messages: [
         {
           role: "system",
@@ -44,7 +44,7 @@ Follow these guidelines:
 8. Provide safety tips and local emergency numbers
 9. Include a budget breakdown
 10. Add alternative options for each day
-
+IMPORTANT: Always respond in Turkish language. All travel plans, recommendations, and explanations should be provided in Turkish.
 IMPORTANT: At the end of your response, add a "LOCATIONS:" section that lists ONLY the specific places to visit, one per line, in this format:
 LOCATIONS:
 - [Specific Place Name with City if needed]

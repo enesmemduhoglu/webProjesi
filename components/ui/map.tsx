@@ -28,7 +28,6 @@ const Map = ({ markers }: MapProps) => {
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
 
   const onLoad = useCallback((map: google.maps.Map) => {
-    console.log('Map loaded successfully');
     setIsLoaded(true);
     if (markers.length > 0) {
       const bounds = new google.maps.LatLngBounds();
@@ -45,7 +44,6 @@ const Map = ({ markers }: MapProps) => {
   }, []);
 
   const onScriptLoad = useCallback(() => {
-    console.log('Google Maps API loaded');
     setIsScriptLoaded(true);
   }, []);
 

@@ -24,13 +24,11 @@ export default function Home() {
   const extractLocations = async (text: string) => {
     const foundLocations: Location[] = [];
     
-    console.log('Extracting locations from text:', text);
-    
+   
     const locationsMatch = text.match(/\*\*LOCATIONS:\*\*\n([\s\S]*?)(?=\n\n|$)/);
     if (!locationsMatch) {
       const altLocationsMatch = text.match(/LOCATIONS:\n([\s\S]*?)(?=\n\n|$)/);
       if (!altLocationsMatch) {
-        console.log('No LOCATIONS section found');
         return foundLocations;
       }
       
@@ -40,7 +38,6 @@ export default function Home() {
         if (!placeName) continue;
         
         try {
-          console.log('Searching for location:', placeName);
           const response = await fetch(`/api/places?query=${encodeURIComponent(placeName)}`);
           
           if (!response.ok) {
@@ -49,11 +46,9 @@ export default function Home() {
           }
 
           const data = await response.json();
-          console.log('Places API response:', data);
           
           if (data.results && data.results.length > 0) {
             const place = data.results[0];
-            console.log('Found place:', place);
             
             if (!foundLocations.some(loc => loc.name === place.name)) {
               foundLocations.push({
@@ -61,7 +56,6 @@ export default function Home() {
                 lat: place.geometry.location.lat,
                 lng: place.geometry.location.lng
               });
-              console.log('Added location:', place.name);
             }
           }
         } catch (error) {
@@ -77,7 +71,6 @@ export default function Home() {
       if (!placeName) continue;
 
       try {
-        console.log('Searching for location:', placeName);
         const response = await fetch(`/api/places?query=${encodeURIComponent(placeName)}`);
         
         if (!response.ok) {
@@ -86,11 +79,9 @@ export default function Home() {
         }
 
         const data = await response.json();
-        console.log('Places API response:', data);
         
         if (data.results && data.results.length > 0) {
           const place = data.results[0];
-          console.log('Found place:', place);
           
           if (!foundLocations.some(loc => loc.name === place.name)) {
             foundLocations.push({
@@ -98,7 +89,6 @@ export default function Home() {
               lat: place.geometry.location.lat,
               lng: place.geometry.location.lng
             });
-            console.log('Added location:', place.name);
           }
         }
       } catch (error) {
@@ -106,7 +96,6 @@ export default function Home() {
       }
     }
     
-    console.log('Final locations:', foundLocations);
     return foundLocations;
   };
 
